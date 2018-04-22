@@ -11,12 +11,12 @@ Simply clone the repository, execute "npm install", add your Bing Speech API and
 <table>
   <tr>
     <td>
-      <img src="./preview1.png" width="400" height="400"/>
+      <img src="./preview1.png" width="500" height="500"/>
     </td>
   </tr>
   <tr>
     <td>
-      <img src="./preview2.png" width="400" height="400"/>
+      <img src="./preview2.png" width="500" height="500"/>
     </td>
   </tr>
 </table>
