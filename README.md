@@ -10,5 +10,5 @@ Simply clone the repository, execute "npm install", add your Bing Speech API and
 
 
 
-![Alt text](https://challengepost-s3-challengepost.netdna-ssl.com/photos/production/software_photos/000/632/213/datas/gallery.jpg "Optional title")
+
 
