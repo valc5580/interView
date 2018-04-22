@@ -6,4 +6,4 @@ The current iteration asks the user 2 interview questions, displays their emotio
 
 This was built using a Node server, using Express for routing, socket.io for communicating between the front end and the backend, a mongodb database, as well as microsoft FACE api and their Bing Speech api.
 
-Simply clone the repository, add your Bing Speech API and Microsoft FACE API subscription keys in the home.ejs file, and replace "http://localhost:3000" in all filed with whatever URL you like.
+Simply clone the repository, add your Bing Speech API and Microsoft FACE API subscription keys in the home.ejs file, and replace "http://localhost:3000" in all files with whatever URL you like.
