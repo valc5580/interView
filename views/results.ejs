@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Dashboard</title>
+
+    <style type="text/css">/* Chart.js */
+
+    .bLeft {
+      /*height:100px;*/
+      border: none;
+      cursor: pointer;
+      color: white;
+      padding: 15px 40px;
+      border-radius: 2px;
+      background: rgba(255,0,0,0.3);
+    }
+
+    .bLeft{
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bLeft:focus {outline:0;}
+
+    </style>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+    <script src="http://www.chartjs.org/samples/latest/utils.js"></script>
+    <script type="text/javascript" src="http://bernii.github.io/gauge.js/dist/gauge.min.js"></script>
+</head>
+<body style="opacity:0">
+	<table style="margin: auto; width:1500px">
+        <tr class="first">
+            <td colspan="6">
+                <h1 align="center">Question #1 Feedback</h1>
+            </td>
+        </tr>
+
+        <tr class="first">
+            <td colspan="2" style="text-align: center; font-size: 25px; color: #4f597d">Emotion Breakdown</td>
+            <td colspan="2" style="text-align: center; font-size: 25px; color: #4f597d">Eye Contact</td>
+            <td colspan="2" style="text-align: center; font-size: 25px; color: #4f597d">Movement Spread</td>
+        </tr>
+        <tr style="height:400px; border: 2px solid red;" class="first">
+            <td colspan="2">
+                
+                <canvas id="pie-area" style="display: block; height: 400px; width: 500px;" width="872" height="436" class="chartjs-render-monitor">                
+                </canvas>
+
+            </td>
+            <td colspan="2" >
+                <div style="width:420px; padding: 0px; justify-content: center; text-align: center">
+                <button id="lef" style="margin:7px; font-size: 15px;" class="bLeft">Left<br><span id="lefText">0</span>s</button>
+                <button id="cen" style="margin:7px; font-size: 15px; background:#00e500" class="bLeft">Center<br><span id="cenText">0</span>s</button>
+                <button id="rig" style="margin:7px; font-size: 15px;" class="bLeft">Right<br><span id="rigText">0</span>s</button>
+                <br>
+                <button id="dow" class="bLeft" style="margin-top:5px; width:200px; font-size: 15px;">Down <br><span id="dowText">0</span>s</button>
+                </div>                
+            </td>
+            <td colspan="2">      
+                <canvas id="chart-0" style="display: block; height: 400px; width: 400px; " width="400" height="400" class="chartjs-render-monitor">
+                </canvas>          
+            </td>
+        </tr>
+        <tr class="first">
+            <td colspan="2" >
+                <span id="emotionResponse"></span>
+            </td>
+            <td colspan="2" >
+                <span id="eyeResponse"> </span>
+                
+            </td>
+            <td id="standard deviation" colspan="2" > 
+            </td>
+        </tr>
+        <tr class="first">
+            <td colspan="6">
+                <br>
+                <br>
+                <br>
+                <br>
+            </td>
+        </tr>
+        <tr class="first" >
+            
+            <td colspan="3" style="text-align: center; font-size: 25px; color: #4f597d">Stall/Filler Words</td>
+            <td colspan="3" style="text-align: center; font-size: 25px; color: #4f597d">Speech Speed</td>
+        </tr>
+        <tr class="first">
+            <td  style="text-align:center;" colspan="3" >
+                <div style="width: 600px;">
+                    <canvas id="bar" style="display: block;" class="chartjs-render-monitor"></canvas>
+                </div>   
+            </td>
+            <td style="text-align:center;" colspan="3" >
+                <canvas style="width:500px" id="speedometer"></canvas>
+            </td>
+        </tr>
+        <tr class="first">
+            <td colspan="3" >
+                <span id="stall"></span>                
+            </td>
+            <td colspan="3" >
+                <span id="speechSpeed"></span>                
+            </td>
+        </tr>
+        <tr class="first">
+            <td colspan="6" >
+                <br>
+                <br>
+                <br>
+                <span id="horizontal rule" style="display:none"><hr></span>
+            </td>
+        </tr>
+        <tr class="second" >
+            <td colspan="6">
+                <h1 align="center">Question #2 Feedback</h1>
+            </td>
+        </tr>
+
+        <tr class="second" >
+            <td colspan="2" style="text-align: center; font-size: 25px; color: #4f597d">Emotion Breakdown</td>
+            <td colspan="2" style="text-align: center; font-size: 25px; color: #4f597d">Eye Contact</td>
+            <td colspan="2" style="text-align: center; font-size: 25px; color: #4f597d">Movement Spread</td>
+        </tr>
+        <tr style="height:400px; border: 2px solid red;" class="second">
+            <td colspan="2">
+                
+                <canvas id="pie-area2" style="display: block; height: 400px; width: 500px;" width="872" height="436" class="chartjs-render-monitor">                
+                </canvas>
+
+            </td>
+            <td colspan="2" >
+                <div style="width:420px; padding: 0px; justify-content: center; text-align: center">
+                <button id="lef2" style="margin:7px; font-size: 15px;" class="bLeft">Left<br><span id="lefText2">0</span>s</button>
+                <button id="cen2" style="margin:7px; font-size: 15px; background:#00e500" class="bLeft">Center<br><span id="cenText2">0</span>s</button>
+                <button id="rig2" style="margin:7px; font-size: 15px;" class="bLeft">Right<br><span id="rigText2">0</span>s</button>
+                <br>
+                <button id="dow2" class="bLeft" style="margin-top:5px; width:200px; font-size: 15px;">Down <br><span id="dowText2">0</span>s</button>
+                </div>                
+            </td>
+            <td colspan="2" >      
+                <canvas id="chart-02" style="display: block; height: 400px; width: 400px; " width="400" height="400" class="chartjs-render-monitor">
+                </canvas>          
+            </td>
+        </tr>
+        <tr class="second" >
+            <td colspan="2" >
+                <span id="emotionResponse2"></span>
+            </td>
+            <td colspan="2" >
+                <span id="eyeResponse2"> </span>
+                
+            </td>
+            <td id="standard deviation2" colspan="2" > 
+            </td>
+        </tr>
+        <tr class="second" >
+            <td colspan="6">
+                <br>
+                <br>
+                <br>
+                <br>
+            </td>
+        </tr>
+        <tr class="second">
+            
+            <td colspan="3" style="text-align: center; font-size: 25px; color: #4f597d">Stall/Filler Words</td>
+            <td colspan="3" style="text-align: center; font-size: 25px; color: #4f597d">Speech Speed</td>
+        </tr>
+        <tr class="second" >
+            <td  style="text-align:center;" colspan="3" >
+                <div style="width: 600px;">
+                    <canvas id="bar2" style="display: block;" class="chartjs-render-monitor"></canvas>
+                </div>   
+            </td>
+            <td style="text-align:center;" colspan="3" >
+                <canvas style="width:500px" id="speedometer2"></canvas>
+            </td>
+        </tr>
+        <tr class="second" >
+            <td colspan="3" >
+                <span id="stall2"></span>                
+            </td>
+            <td colspan="3" >
+                <span id="speechSpeed2"></span>                
+            </td>
+        </tr>
+        
+	</table>
+    
+
+    <script type="text/javascript">
+        //Script for eye contact button functionality
+        var lookleft= document.getElementById("lef");
+        var lookright= document.getElementById("rig");
+        var lookcenter= document.getElementById("cen");
+        var lookdown= document.getElementById("dow");
+
+        var lookleft2= document.getElementById("lef2");
+        var lookright2= document.getElementById("rig2");
+        var lookcenter2= document.getElementById("cen2");
+        var lookdown2= document.getElementById("dow2");
+
+        var size=16;
+        var it=1;
+
+        function capsule1(){
+        function loop() {
+            if(size==19)
+                it=it*(-1);
+            if (size==14){
+                it=1;
+                clearInterval(funct);
+            }
+            lookleft.style.fontSize=size+it+"px";
+            size=size+it;
+        }
+        
+        var funct=setInterval(loop, 30);
+        }
+
+        function capsule2(){
+        function loop() {
+            if(size==19)
+                it=it*(-1);
+            if (size==14){
+                it=1;
+                clearInterval(funct);
+            }
+            lookright.style.fontSize=size+it+"px";
+            size=size+it;
+        }
+        
+        var funct=setInterval(loop, 30);
+        }
+
+        function capsule3(){
+        function loop() {
+            if(size==19)
+                it=it*(-1);
+            if (size==14){
+                it=1;
+                clearInterval(funct);
+            }
+            lookdown.style.fontSize=size+it+"px";
+            size=size+it;
+        }
+        
+        var funct=setInterval(loop, 30);
+        }
+
+        function capsule4(){
+        function loop() {
+            if(size==19)
+                it=it*(-1);
+            if (size==14){
+                it=1;
+                clearInterval(funct);
+            }
+            lookcenter.style.fontSize=size+it+"px";
+            size=size+it;
+        }
+        
+        var funct=setInterval(loop, 30);
+        }
+
+        lookleft.addEventListener("click", capsule1);
+        lookright.addEventListener("click", capsule2);
+        lookcenter.addEventListener("click", capsule4);
+        lookdown.addEventListener("click", capsule3);
+
+
+
+        var lookleft2= document.getElementById("lef2");
+        var lookright2= document.getElementById("rig2");
+        var lookcenter2= document.getElementById("cen2");
+        var lookdown2= document.getElementById("dow2");
+
+        var size2=16;
+        var it2=1;
+
+        function capsule12(){
+        function loop() {
+            if(size==19)
+                it=it*(-1);
+            if (size==14){
+                it=1;
+                clearInterval(funct);
+            }
+            lookleft2.style.fontSize=size+it+"px";
+            size=size+it;
+        }
+        
+        var funct=setInterval(loop, 30);
+        }
+
+        function capsule22(){
+        function loop() {
+            if(size==19)
+                it=it*(-1);
+            if (size==14){
+                it=1;
+                clearInterval(funct);
+            }
+            lookright2.style.fontSize=size+it+"px";
+            size=size+it;
+        }
+        
+        var funct=setInterval(loop, 30);
+        }
+
+        function capsule32(){
+        function loop() {
+            if(size==19)
+                it=it*(-1);
+            if (size==14){
+                it=1;
+                clearInterval(funct);
+            }
+            lookdown2.style.fontSize=size+it+"px";
+            size=size+it;
+        }
+        
+        var funct=setInterval(loop, 30);
+        }
+
+        function capsule42(){
+        function loop() {
+            if(size==19)
+                it=it*(-1);
+            if (size==14){
+                it=1;
+                clearInterval(funct);
+            }
+            lookcenter2.style.fontSize=size+it+"px";
+            size=size+it;
+        }
+        
+        var funct=setInterval(loop, 30);
+        }
+
+        lookleft2.addEventListener("click", capsule12);
+        lookright2.addEventListener("click", capsule22);
+        lookcenter2.addEventListener("click", capsule42);
+        lookdown2.addEventListener("click", capsule32);
+
+    </script>
+
+
+    <script type="text/javascript">
+        var config = {
+            type: 'pie',
+            data: {
+                datasets: [{
+                    data: [
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1
+                    ],
+                    backgroundColor: [
+                        window.chartColors.red,
+                        window.chartColors.orange,
+                        '#FFE4C4',                        
+                        window.chartColors.green,
+                        window.chartColors.blue,
+                        '#F0F8FF',
+                        window.chartColors.grey,
+                        window.chartColors.yellow,
+
+
+                    ],
+                    label: 'Emotions'
+                }],
+                labels: [
+                    'Anger',
+                    'Contempt',
+                    'Disgust',
+                    'Fear',
+                    'Happiness',
+                    'Neutral',
+                    'Sadness',
+                    'Surprise'
+                ]
+            },
+            options: {
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem, data) {
+                            var allData = data.datasets[tooltipItem.datasetIndex].data;
+                            var tooltipLabel = data.labels[tooltipItem.index];
+                            var tooltipData = allData[tooltipItem.index];
+                            var total = 0;
+                            for (var i in allData) {
+                                total += allData[i];
+                            }
+                            var tooltipPercentage = ((tooltipData / total) * 100).toFixed(2);
+                            return tooltipLabel + ': ' + tooltipData + ' (' + tooltipPercentage + '%)';
+                        }
+                    }
+                },
+    
+                responsive: true
+            }
+        };
+
+        var config2 = {
+            type: 'pie',
+            data: {
+                datasets: [{
+                    data: [
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1
+                    ],
+                    backgroundColor: [
+                        window.chartColors.red,
+                        window.chartColors.orange,
+                        '#FFE4C4',                        
+                        window.chartColors.green,
+                        window.chartColors.blue,
+                        '#F0F8FF',
+                        window.chartColors.grey,
+                        window.chartColors.yellow,
+
+
+                    ],
+                    label: 'Emotions'
+                }],
+                labels: [
+                    'Anger',
+                    'Contempt',
+                    'Disgust',
+                    'Fear',
+                    'Happiness',
+                    'Neutral',
+                    'Sadness',
+                    'Surprise'
+                ]
+            },
+            options: {
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem, data) {
+                            var allData = data.datasets[tooltipItem.datasetIndex].data;
+                            var tooltipLabel = data.labels[tooltipItem.index];
+                            var tooltipData = allData[tooltipItem.index];
+                            var total = 0;
+                            for (var i in allData) {
+                                total += allData[i];
+                            }
+                            var tooltipPercentage = ((tooltipData / total) * 100).toFixed(2);
+                            return tooltipLabel + ': ' + tooltipData + ' (' + tooltipPercentage + '%)';
+                        }
+                    }
+                },
+    
+                responsive: true
+            }
+        };
+
+        var ctxPie = document.getElementById('pie-area').getContext('2d');
+        window.myPie = new Chart(ctxPie, config);
+
+        var ctxPie2 = document.getElementById('pie-area2').getContext('2d');
+        window.myPie2 = new Chart(ctxPie2, config2);
+
+
+        var utils = Samples.utils;
+
+        var coordinates = {
+            datasets: [{
+                data: [{x:-450, y:-300, v:1},{x:450, y:300, v:1}]
+            }]
+        };
+        var coordinates2 = {
+            datasets: [{
+                data: [{x:-450, y:-300, v:1},{x:450, y:300, v:1}]
+            }]
+        };
+
+        var options = {
+            aspectRatio: 1,
+            legend: false,
+            tooltips: false,
+
+            elements: {
+                point: {
+                    backgroundColor: "rgba(127, 255, 212,0.5)",//colorize.bind(null, false),
+
+                    borderColor: "rgba(95,158,160, 0.5)",//colorize.bind(null, true),
+
+                    borderWidth: function(context) {
+                        return Math.min(Math.max(1, context.datasetIndex + 1), 8);
+                    },
+
+                    hoverBackgroundColor: 'transparent',
+
+                    hoverBorderColor: function(context) {
+                        return utils.color(context.datasetIndex);
+                    },
+
+                    hoverBorderWidth: function(context) {
+                        var value = context.dataset.data[context.dataIndex];
+                        return Math.round(8 * value.v / 1000);
+                    },
+
+                    radius: function(context) {
+                        var value = context.dataset.data[context.dataIndex];
+                        var size = context.chart.width;
+                        var base = Math.abs(value.v) / 1000;
+                        return (size / 24) * base;
+                    }
+                }
+            }
+        };
+
+        
+
+        var chart = new Chart('chart-0', {
+            type: 'bubble',
+            data: coordinates,
+            options: options
+        });
+
+        var chart2 = new Chart('chart-02', {
+            type: 'bubble',
+            data: coordinates2,
+            options: options
+        });
+        
+
+        window.onload = function() {   
+            var a=document.getElementsByClassName("second");
+            for (var i=0; i<a.length; i++){
+                a[i].style.display="none";
+            }
+
+            document.getElementsByTagName("body")[0].style.opacity=1;
+
+
+
+            socket.emit('resultsLoad');
+
+        };
+
+    </script>
+
+    <script type="text/javascript">
+        
+        var barChartData = {
+            labels: ['Umm..', 'Like..', 'You Know..'],
+            datasets: [{
+                label: 'Dataset 1',
+                backgroundColor: ["rgba(255, 99, 132, 0.2)","rgba(255, 159, 64, 0.2)","rgba(255, 205, 86, 0.2)"],
+                borderColor: ["rgba(255, 99, 132, 0.2)","rgba(255, 159, 64, 0.2)","rgba(255, 205, 86, 0.2)"],
+                borderWidth: 1,
+                data: [
+                    0,
+                    0,
+                    0,
+                    
+                    
+                ]
+            }]
+
+        };
+        var barChartData2 = {
+            labels: ['Umm..', 'Like..', 'You Know..'],
+            datasets: [{
+                label: 'Dataset 1',
+                backgroundColor: ["rgba(255, 99, 132, 0.2)","rgba(255, 159, 64, 0.2)","rgba(255, 205, 86, 0.2)"],
+                borderColor: ["rgba(255, 99, 132, 0.2)","rgba(255, 159, 64, 0.2)","rgba(255, 205, 86, 0.2)"],
+                borderWidth: 1,
+                data: [
+                    0,
+                    0,
+                    0,
+                    
+                    
+                ]
+            }]
+
+        };
+
+        
+            var ctxBar = document.getElementById('bar').getContext('2d');
+            window.myBar = new Chart(ctxBar, {
+                type: 'bar',
+                data: barChartData,
+                options: {
+                    scales:{
+                        yAxes:[{ticks:{beginAtZero:true}}]
+                    },
+                    legend: {
+                        display:false,
+                        position: 'top',
+                    },
+                    title: {
+                        display: false,
+                        text: 'Filler/Stall Words'
+                    }
+
+                }
+            });
+
+            var ctxBar2 = document.getElementById('bar2').getContext('2d');
+            window.myBar2 = new Chart(ctxBar2, {
+                type: 'bar',
+                data: barChartData2,
+                options: {
+                    scales:{
+                        yAxes:[{ticks:{beginAtZero:true}}]
+                    },
+                    legend: {
+                        display:false,
+                        position: 'top',
+                    },
+                    title: {
+                        display: false,
+                        text: 'Filler/Stall Words'
+                    }
+
+                }
+            });
+
+        
+    </script>
+
+    <script type="text/javascript">
+        
+
+
+        var opts = {
+            staticLabels: {
+                font: "18px sans-serif",  // Specifies font
+                labels: [70, 110,140, 180, 210, 250],  // Print labels at these values
+                color: "#000000",  // Optional: Label text color
+                fractionDigits: 0  // Optional: Numerical precision. 0=round off.
+            },
+            staticZones: [
+               {strokeStyle: "#F03E3E", min: 70, max: 110}, // Red from 100 to 130
+               {strokeStyle: "#FFDD00", min: 110, max: 140}, // Yellow
+               {strokeStyle: "#30B32D", min: 140, max: 180}, // Green
+               {strokeStyle: "#FFDD00", min: 180, max: 210}, // Yellow
+               {strokeStyle: "#F03E3E", min: 210, max: 250}  // Red
+            ],
+            angle: -0.19, // The span of the gauge arc
+            lineWidth: 0.20, // The line thickness
+            radiusScale: 1, // Relative radius
+            pointer: {
+              length: 0.6, // // Relative to gauge radius
+              strokeWidth: 0.035, // The thickness
+              color: '#000000' // Fill color
+            },
+            limitMax: false,     // If false, max value increases automatically if value > maxValue
+            limitMin: false,     // If true, the min value of the gauge will be fixed
+            colorStart: '#6FADCF',   // Colors
+            colorStop: '#8FC0DA',    // just experiment with them
+            strokeColor: '#E0E0E0',  // to see which ones work best for you
+            generateGradient: true,
+            highDpiSupport: true,     // High resolution support
+  
+        };
+        var target = document.getElementById('speedometer'); // your canvas element
+        var gauge = new Gauge(target).setOptions(opts); // create sexy gauge!
+        gauge.maxValue = 250; // set max gauge value
+        var minValue= 70;
+        gauge.setMinValue(minValue);  // Prefer setter over gauge.minValue = 0
+        gauge.animationSpeed = 32; // set animation speed (32 is default value)
+        gauge.set(90); // set actual value
+
+
+        var target2 = document.getElementById('speedometer2'); // your canvas element
+        var gauge2 = new Gauge(target2).setOptions(opts); // create sexy gauge!
+        gauge2.maxValue = 250; // set max gauge value
+        
+        gauge2.setMinValue(minValue);  // Prefer setter over gauge.minValue = 0
+        gauge2.set(90); // set actual value
+
+
+    </script>
+
+	<script type="text/javascript">
+
+        var emotions={
+            anger: 0,
+            contempt:0,
+            disgust:0,
+            fear:0,
+            happiness:0,
+            neutral:0,
+            sadness:0,
+            surprise:0,
+            total:0
+        };
+
+        var looking={
+            right:0,
+            left:0,
+            down:0,
+            straight:0,
+            total:0
+        };
+
+        var emotions2={
+            anger: 0,
+            contempt:0,
+            disgust:0,
+            fear:0,
+            happiness:0,
+            neutral:0,
+            sadness:0,
+            surprise:0,
+            total:0
+        };
+
+        var looking2={
+            right:0,
+            left:0,
+            down:0,
+            straight:0,
+            total:0
+        };
+
+        var ang=document.getElementById('anger');
+        var cont=document.getElementById("contempt");
+        var dis=document.getElementById("disgust");
+        var f=document.getElementById("fear");
+        var happ=document.getElementById("happiness");
+        var neu=document.getElementById("neutral");
+        var sad=document.getElementById("sadness");         
+        var sur=document.getElementById("surprise");   
+
+        var l=document.getElementById("left");
+        var r=document.getElementById("right");
+        var d=document.getElementById("down");
+        var s=document.getElementById("straight");
+
+        var lef=document.getElementById("lefText");
+        var righ=document.getElementById("rigText");
+        var dow=document.getElementById("dowText");
+        var cen=document.getElementById("cenText");
+
+        var lef2=document.getElementById("lefText2");
+        var righ2=document.getElementById("rigText2");
+        var dow2=document.getElementById("dowText2");
+        var cen2=document.getElementById("cenText2");
+
+        var x=document.getElementById("x");
+        var y=document.getElementById("y");
+        var w=document.getElementById("w");
+
+        var positions=[];
+
+
+        function sigma (a,positions,average){
+            var total=0;
+            if (a=='x'){
+                for (var i=0; i<positions.length; i++){
+                    total=total+Math.pow((positions[i].x-average),2);
+                }
+                return total;    
+            }
+            else if (a=='y'){
+                for (var i=0; i<positions.length; i++){
+                    total=total+Math.pow((positions[i].y-average),2);
+                }
+                return total;
+            }
+            else if (a=='w'){
+                for (var i=0; i<positions.length; i++){
+                    total=total+Math.pow((positions[i].width-average),2);
+                }
+                return total;
+            }
+        }
+
+
+		
+		var socket=io.connect('http://localhost:3000');
+
+        socket.on('loadData',function(response){
+            var rows=document.getElementsByClassName("first");
+            var rows2=document.getElementsByClassName("second");
+            var rule=document.getElementById("horizontal rule");
+            for (var i=0; i<rows.length;i++)
+                rows[i].style.display="";
+            for (var i=0; i<rows2.length;i++)
+                rows2[i].style.display="";
+            rule.style.display="";
+            
+
+
+            console.log(response);
+            var totalEmotions;
+            if ((response.emotions.anger+response.emotions.contempt+response.emotions.disgust+response.emotions.fear+response.emotions.happiness+response.emotions.neutral+response.emotions.sadness+response.emotions.surprise)==0){
+                config.data.datasets[0].data[0]=1;            
+                config.data.datasets[0].data[1]=1;            
+                config.data.datasets[0].data[2]=1;            
+                config.data.datasets[0].data[3]=1;            
+                config.data.datasets[0].data[4]=1;            
+                config.data.datasets[0].data[5]=1;            
+                config.data.datasets[0].data[6]=1;            
+                config.data.datasets[0].data[7]=1;
+                totalEmotions=8;
+            }
+            else{
+                config.data.datasets[0].data[0]=response.emotions.anger;            
+                config.data.datasets[0].data[1]=response.emotions.contempt;            
+                config.data.datasets[0].data[2]=response.emotions.disgust;            
+                config.data.datasets[0].data[3]=response.emotions.fear;            
+                config.data.datasets[0].data[4]=response.emotions.happiness;            
+                config.data.datasets[0].data[5]=response.emotions.neutral;            
+                config.data.datasets[0].data[6]=response.emotions.sadness;            
+                config.data.datasets[0].data[7]=response.emotions.surprise;
+                totalEmotions=response.emotions.anger+response.emotions.contempt+response.emotions.disgust+response.emotions.fear+response.emotions.happiness+response.emotions.neutral+response.emotions.sadness+response.emotions.surprise;
+            }              
+            window.myPie.update();
+            
+            var emotion=document.getElementById("emotionResponse");
+            emotion.innerHTML="";
+            if ((response.emotions.anger+response.emotions.disgust+response.emotions.surprise+response.emotions.sadness+response.emotions.fear)/totalEmotions>0.25)
+                emotion.innerHTML+="<span style='color:red'>Try to display less negative emotions</span><br>";
+            if (response.emotions.happiness/totalEmotions<0.40)
+                emotion.innerHTML+="<span style='color:red'>Displaying too little happiness</span>";
+            else
+                emotion.innerHTML+="<span style='color:green'>Good job with showing positive emotion!</span>";
+
+
+            looking.right=response.eyeContact.right;
+            lookright.click();
+            looking.left=response.eyeContact.left;
+            lookleft.click();
+            looking.down=response.eyeContact.down;
+            lookdown.click();
+            looking.straight=response.eyeContact.straight;
+            lookcenter.click();
+
+            lef.innerText=""+looking.left;
+            righ.innerText=""+looking.right;
+            dow.innerText=""+looking.down;
+            cen.innerText=""+looking.straight;
+
+            var eye=document.getElementById("eyeResponse");
+            eye.innerHTML="";
+            if((looking.straight/(looking.straight+looking.right+looking.left+looking.down))<0.5)
+                eye.innerHTML="<span style='color:red'>Held eye contact only "+((looking.straight/(looking.straight+looking.right+looking.left+looking.down))*100).toFixed(2)+"% of the time</span>";
+            else{
+                eye.innerHTML="<span style='color:green'>Held eye contact "+((looking.straight/(looking.straight+looking.right+looking.left+looking.down))*100).toFixed(2) +"% of the time - Good Job!</span>"
+            }
+
+
+
+            chart.data.datasets[0].data=[{x:-450, y:-300, v:1},{x:450, y:300, v:1}];
+
+            for (var i=0; i<response.positions.length; i++)
+                chart.data.datasets[0].data.push({x:response.positions[i].x-450,y:340-response.positions[i].y,v: response.positions[i].width*7.5 });
+            
+            chart.update();
+
+
+
+
+            var sd= document.getElementById("standard deviation");
+            sd.innerHTML="";
+            var xaverage=0;
+            var yaverage=0;
+            var waverage=0;
+
+            for (var i=0; i<response.positions.length; i++){
+                xaverage=xaverage+response.positions[i].x;
+                yaverage=yaverage+response.positions[i].y;
+                waverage=waverage+response.positions[i].width;
+            }
+            xaverage=xaverage/response.positions.length;
+            yaverage=yaverage/response.positions.length;
+            waverage=waverage/response.positions.length;
+
+
+            var xsigma=sigma ('x',response.positions,xaverage);
+            var ysigma=sigma ('y',response.positions,yaverage);
+            var wsigma=sigma ('w',response.positions,waverage);
+
+
+            var xsd=Math.sqrt(xsigma/response.positions.length);
+            var ysd=Math.sqrt(ysigma/response.positions.length);
+            var wsd=Math.sqrt(wsigma/response.positions.length);
+
+            sd.innerHTML+="<span style='color:black'>σX : "+xsd.toFixed(2);
+            if (xsd>=50)
+                sd.innerHTML+="<span style='color:red'> - too much horizontal movement</span></span><br>";
+            else if (xsd<15)
+                sd.innerHTML+="<span style='color:green'> - Good job with minimizing horizontal movement</span></span><br>";
+            else
+                sd.innerHTML+="</span><br>";
+
+
+            sd.innerHTML+="<span style='color:black'>σY : "+ysd.toFixed(2);
+            if (ysd>=50)
+                sd.innerHTML+="<span style='color:red'> - too much vertical movement</span></span><br>";
+            else if (ysd<15)
+                sd.innerHTML+="<span style='color:green'> - Good job with minimizing vertical movement</span></span><br>";
+            else
+                sd.innerHTML+="</span><br>";
+
+
+            sd.innerHTML+="<span style='color:black'>σD : "+wsd.toFixed(2);
+            if (wsd>=50)
+                sd.innerHTML+="<span style='color:red'> - too much forward/backward movement</span></span>";
+            else if (wsd<15)
+                sd.innerHTML+="<span style='color:green'> - Good job with forward/backward movement</span></span>";
+            else
+                sd.innerHTML+="</span><br>";
+
+
+            if (response.words.length>0){
+                var totalWords=0;
+                var totalDuration=0;
+
+                barChartData.datasets[0].data[0]=0;
+                barChartData.datasets[0].data[1]=0;
+                barChartData.datasets[0].data[2]=0;
+
+                for (var i=0;i<response.words.length; i++){
+                    barChartData.datasets[0].data[0]+=response.words[i].um;
+                    barChartData.datasets[0].data[1]+=response.words[i].like;
+                    barChartData.datasets[0].data[2]+=response.words[i].youKnow;
+                    totalWords+=response.words[i].total;
+                    totalDuration+=(response.words[i].duration/10000000);
+
+
+                }
+                window.myBar.update();
+
+                var stall=document.getElementById("stall");
+                stall.innerHTML="";
+                var stallWords=((barChartData.datasets[0].data[0]+barChartData.datasets[0].data[1]+barChartData.datasets[0].data[2])/response.words.length).toFixed(2);
+                if (stallWords<=0.15)
+                    stall.innerHTML="<span style='color:green'>Only "+(stallWords*100).toFixed(2)+"% of sentences contained stall words - Good job!</span";
+                else
+                    stall.innerHTML="<span style='color:red'>"+(stallWords*100).toFixed(2)+"% of sentences contained stall words </span";
+
+
+                var totalWordsPerMin=(totalWords/totalDuration*60).toFixed(2);;
+                
+                
+                if (totalWordsPerMin<minValue)
+                    gauge.set(minValue);
+                else if(totalWordsPerMin>gauge.maxValue)
+                    gauge.set(gauge.maxValue);
+                else
+                    gauge.set(totalWordsPerMin);
+
+                
+
+
+                var speechSpeed=document.getElementById("speechSpeed");
+                speechSpeed.innerHTML="";
+                if (totalWordsPerMin<140)
+                    speechSpeed.innerHTML="Average speech speed is <b>"+totalWordsPerMin+" words/min</b> <span style='color:red'>- Try speaking slightly faster</span>";
+                else if(totalWordsPerMin>180)
+                    speechSpeed.innerHTML="Average speech speed is <b>"+totalWordsPerMin+" words/min</b> <span style='color:red'>- Try speaking slightly slower</span>";
+                else
+                    speechSpeed.innerHTML="Average speech speed is <b>"+totalWordsPerMin+" words/min</b> <span style='color:green'>- Perfect speaking pace</span>";
+            }
+            else{
+                var stall=document.getElementById("stall");
+                var speechSpeed=document.getElementById("speechSpeed");
+
+                stall.innerHTML="<span style='color:red'>No words spoken for this question</span>";
+                speechSpeed.innerHTML="<span style='color:red'>No words spoken for this question</span>";
+
+            }
+
+
+
+        });
+
+
+        socket.on('loadData2',function(response){
+            console.log(response);
+            var totalEmotions;
+            if ((response.emotions.anger+response.emotions.contempt+response.emotions.disgust+response.emotions.fear+response.emotions.happiness+response.emotions.neutral+response.emotions.sadness+response.emotions.surpris2)==0){
+                config2.data.datasets[0].data[0]=1;            
+                config2.data.datasets[0].data[1]=1;            
+                config2.data.datasets[0].data[2]=1;            
+                config2.data.datasets[0].data[3]=1;            
+                config2.data.datasets[0].data[4]=1;            
+                config2.data.datasets[0].data[5]=1;            
+                config2.data.datasets[0].data[6]=1;            
+                config2.data.datasets[0].data[7]=1;
+                totalEmotions=8;
+            }
+            else{
+                config2.data.datasets[0].data[0]=response.emotions.anger;            
+                config2.data.datasets[0].data[1]=response.emotions.contempt;            
+                config2.data.datasets[0].data[2]=response.emotions.disgust;            
+                config2.data.datasets[0].data[3]=response.emotions.fear;            
+                config2.data.datasets[0].data[4]=response.emotions.happiness;            
+                config2.data.datasets[0].data[5]=response.emotions.neutral;            
+                config2.data.datasets[0].data[6]=response.emotions.sadness;            
+                config2.data.datasets[0].data[7]=response.emotions.surprise;
+                totalEmotions=response.emotions.anger+response.emotions.contempt+response.emotions.disgust+response.emotions.fear+response.emotions.happiness+response.emotions.neutral+response.emotions.sadness+response.emotions.surprise;
+            }            
+            window.myPie2.update();
+            var emotion=document.getElementById("emotionResponse2");
+            emotion.innerHTML="";
+            if ((response.emotions.anger+response.emotions.disgust+response.emotions.surprise+response.emotions.sadness+response.emotions.fear)/totalEmotions>0.25)
+                emotion.innerHTML+="<span style='color:red'>Try to display less negative emotions</span><br>";
+            if (response.emotions.happiness/totalEmotions<0.40)
+                emotion.innerHTML+="<span style='color:red'>Displaying too little happiness</span>";
+            else
+                emotion.innerHTML+="<span style='color:green'>Good job with showing positive emotion!</span>";
+
+
+            looking2.right=response.eyeContact.right;
+            lookright2.click();
+            looking2.left=response.eyeContact.left;
+            lookleft2.click();
+            looking2.down=response.eyeContact.down;
+            lookdown2.click();
+            looking2.straight=response.eyeContact.straight;
+            lookcenter2.click();
+
+            lef2.innerText=""+looking2.left;
+            righ2.innerText=""+looking2.right;
+            dow2.innerText=""+looking2.down;
+            cen2.innerText=""+looking2.straight;
+
+            var eye=document.getElementById("eyeResponse2");
+            eye.innerHTML="";
+            if((looking2.straight/(looking2.straight+looking2.right+looking2.left+looking2.down))<0.5)
+                eye.innerHTML="<span style='color:red'>Held eye contact only "+((looking2.straight/(looking2.straight+looking2.right+looking2.left+looking2.down))*100).toFixed(2)+"% of the time</span>";
+            else{
+                eye.innerHTML="<span style='color:green'>Held eye contact "+((looking2.straight/(looking2.straight+looking2.right+looking2.left+looking2.down))*100).toFixed(2) +"% of the time - Good Job!</span>"
+            }
+
+
+
+            chart2.data.datasets[0].data=[{x:-450, y:-300, v:1},{x:450, y:300, v:1}];
+
+            for (var i=0; i<response.positions.length; i++)
+                chart2.data.datasets[0].data.push({x:response.positions[i].x-450,y:340-response.positions[i].y,v: response.positions[i].width*7.5 });
+            
+            chart2.update();
+
+
+
+
+            var sd= document.getElementById("standard deviation2");
+            sd.innerHTML="";
+            var xaverage=0;
+            var yaverage=0;
+            var waverage=0;
+
+            for (var i=0; i<response.positions.length; i++){
+                xaverage=xaverage+response.positions[i].x;
+                yaverage=yaverage+response.positions[i].y;
+                waverage=waverage+response.positions[i].width;
+            }
+            xaverage=xaverage/response.positions.length;
+            yaverage=yaverage/response.positions.length;
+            waverage=waverage/response.positions.length;
+
+
+            var xsigma=sigma ('x',response.positions,xaverage);
+            var ysigma=sigma ('y',response.positions,yaverage);
+            var wsigma=sigma ('w',response.positions,waverage);
+
+
+            var xsd=Math.sqrt(xsigma/response.positions.length);
+            var ysd=Math.sqrt(ysigma/response.positions.length);
+            var wsd=Math.sqrt(wsigma/response.positions.length);
+
+            sd.innerHTML+="<span style='color:black'>σX : "+xsd.toFixed(2);
+            if (xsd>=50)
+                sd.innerHTML+="<span style='color:red'> - too much horizontal movement</span></span><br>";
+            else if (xsd<15)
+                sd.innerHTML+="<span style='color:green'> - Good job with minimizing horizontal movement</span></span><br>";
+            else
+                sd.innerHTML+="</span><br>";
+
+
+            sd.innerHTML+="<span style='color:black'>σY : "+ysd.toFixed(2);
+            if (ysd>=50)
+                sd.innerHTML+="<span style='color:red'> - too much vertical movement</span></span><br>";
+            else if (ysd<15)
+                sd.innerHTML+="<span style='color:green'> - Good job with minimizing vertical movement</span></span><br>";
+            else
+                sd.innerHTML+="</span><br>";
+
+
+            sd.innerHTML+="<span style='color:black'>σD : "+wsd.toFixed(2);
+            if (wsd>=50)
+                sd.innerHTML+="<span style='color:red'> - too much forward/backward movement</span></span>";
+            else if (wsd<15)
+                sd.innerHTML+="<span style='color:green'> - Good job with forward/backward movement</span></span>";
+            else
+                sd.innerHTML+="</span><br>";
+
+
+            if (response.words.length>0){
+                var totalWords=0;
+                var totalDuration=0;
+
+                barChartData2.datasets[0].data[0]=0;
+                barChartData2.datasets[0].data[1]=0;
+                barChartData2.datasets[0].data[2]=0;
+
+                for (var i=0;i<response.words.length; i++){
+                    barChartData2.datasets[0].data[0]+=response.words[i].um;
+                    barChartData2.datasets[0].data[1]+=response.words[i].like;
+                    barChartData2.datasets[0].data[2]+=response.words[i].youKnow;
+                    totalWords+=response.words[i].total;
+                    totalDuration+=(response.words[i].duration/10000000);
+
+
+                }
+                window.myBar2.update();
+
+                var stall=document.getElementById("stall2");
+                stall.innerHTML="";
+                var stallWords=((barChartData2.datasets[0].data[0]+barChartData2.datasets[0].data[1]+barChartData2.datasets[0].data[2])/response.words.length).toFixed(2);
+                if (stallWords<=0.15)
+                    stall.innerHTML="<span style='color:green'>Only "+(stallWords*100).toFixed(2)+"% of sentences contained stall words - Good job!</span";
+                else
+                    stall.innerHTML="<span style='color:red'>"+(stallWords*100).toFixed(2)+"% of sentences contained stall words </span";
+
+
+
+
+
+                var totalWordsPerMin=(totalWords/totalDuration*60).toFixed(2);;
+                
+                
+                if (totalWordsPerMin<minValue)
+                    gauge2.set(minValue);
+                else if(totalWordsPerMin>gauge.maxValue)
+                    gauge2.set(gauge.maxValue);
+                else
+                    gauge2.set(totalWordsPerMin);
+
+                
+
+
+                var speechSpeed=document.getElementById("speechSpeed2");
+                speechSpeed.innerHTML="";
+                if (totalWordsPerMin<140)
+                    speechSpeed.innerHTML="Average speech speed is <b>"+totalWordsPerMin+" words/min</b> <span style='color:red'>- Try speaking slightly faster</span>";
+                else if(totalWordsPerMin>180)
+                    speechSpeed.innerHTML="Average speech speed is <b>"+totalWordsPerMin+" words/min</b> <span style='color:red'>- Try speaking slightly slower</span>";
+                else
+                    speechSpeed.innerHTML="Average speech speed is <b>"+totalWordsPerMin+" words/min</b> <span style='color:green'>- Perfect speaking pace</span>"
+            }
+            else{
+                var stall2=document.getElementById("stall2");
+                var speechSpeed2=document.getElementById("speechSpeed2");
+
+                stall2.innerHTML="<span style='color:red'>No words spoken for this question</span>";
+                speechSpeed2.innerHTML="<span style='color:red'>No words spoken for this question</span>";
+
+            }
+
+        });
+
+		
+    	socket.on('update',function(response){
+            if (response.question==1){
+                config.data.datasets[0].data[0]=emotions.anger;
+                config.data.datasets[0].data[1]=emotions.contempt;
+                config.data.datasets[0].data[2]=emotions.disgust;
+                config.data.datasets[0].data[3]=emotions.fear;
+                config.data.datasets[0].data[4]=emotions.happiness;
+                config.data.datasets[0].data[5]=emotions.neutral;
+                config.data.datasets[0].data[6]=emotions.sadness;
+                config.data.datasets[0].data[7]=emotions.surprise;
+
+             	if (response.emotion=="anger"){
+                	emotions.anger++;
+                	emotions.total++;
+                    config.data.datasets[0].data[0]=emotions.anger;            
+                    window.myPie.update();
+             	}
+                else if (response.emotion=="contempt"){
+                	emotions.contempt++;
+                	emotions.total++;
+                    config.data.datasets[0].data[1]=emotions.contempt;            
+                    window.myPie.update();
+                }
+                else if (response.emotion=="disgust"){
+                	emotions.disgust++;
+                	emotions.total++;
+                    config.data.datasets[0].data[2]=emotions.disgust;            
+                    window.myPie.update();
+                }
+                else if (response.emotion=="fear"){
+                	emotions.fear++;
+                	emotions.total++;
+                    config.data.datasets[0].data[3]=emotions.fear;            
+                    window.myPie.update();
+                }
+                else if (response.emotion=="happiness"){
+                	emotions.happiness++;
+                	emotions.total++;
+                    config.data.datasets[0].data[4]=emotions.happiness;            
+                    window.myPie.update();
+                }
+                else if (response.emotion=="neutral"){
+                	emotions.neutral++;
+                	emotions.total++;
+                    config.data.datasets[0].data[5]=emotions.neutral;            
+                    window.myPie.update();
+                }
+                else if (response.emotion=="sadness"){
+                	emotions.sadness++;
+                	emotions.total++;
+                    config.data.datasets[0].data[6]=emotions.sadness;            
+                    window.myPie.update();
+                }
+                else if (response.emotion=="surprise"){
+                	emotions.surprise++;
+                	emotions.total++;
+                    config.data.datasets[0].data[7]=emotions.surprise;            
+                    window.myPie.update();
+                }
+                
+
+
+                /////////////////////////////
+                if (response.looking=="right"){
+                	looking.right++;
+                	looking.total++;
+                    lookright.click();
+             	}
+                else if (response.looking=="left"){
+                	looking.left++;
+                	looking.total++;
+                    lookleft.click();
+                }
+                else if (response.looking=="down"){
+                	looking.down++;
+                	looking.total++;
+                    lookdown.click();
+                }
+                else if (response.looking=="straight"){
+                	looking.straight++;
+                	looking.total++;
+                    lookcenter.click();
+
+                }
+
+
+                lef.innerText=""+looking.left;
+                righ.innerText=""+looking.right;
+                dow.innerText=""+looking.down;
+                cen.innerText=""+looking.straight;
+
+
+                //add positions to local array
+                positions.push(response.position);
+
+
+                chart.data.datasets[0].data.push({x:response.position.x-450,y:340-response.position.y,v: response.position.width*7.5 });
+                chart.update();
+            }
+            else if (response.question==2){
+                var rows=document.getElementsByClassName("first");
+                var rows2=document.getElementsByClassName("second");
+                for (var i=0; i<rows.length;i++)
+                    rows[i].style.display="none";
+                for (var i=0; i<rows2.length; i++)
+                    rows2[i].style.display="";
+
+
+
+
+                config2.data.datasets[0].data[0]=emotions2.anger;
+                config2.data.datasets[0].data[1]=emotions2.contempt;
+                config2.data.datasets[0].data[2]=emotions2.disgust;
+                config2.data.datasets[0].data[3]=emotions2.fear;
+                config2.data.datasets[0].data[4]=emotions2.happiness;
+                config2.data.datasets[0].data[5]=emotions2.neutral;
+                config2.data.datasets[0].data[6]=emotions2.sadness;
+                config2.data.datasets[0].data[7]=emotions2.surprise;
+
+                if (response.emotion=="anger"){
+                    emotions2.anger++;
+                    emotions2.total++;
+                    config2.data.datasets[0].data[0]=emotions22.anger;            
+                    window.myPie2.update();
+                }
+                else if (response.emotion=="contempt"){
+                    emotions2.contempt++;
+                    emotions2.total++;
+                    config2.data.datasets[0].data[1]=emotions2.contempt;            
+                    window.myPie2.update();
+                }
+                else if (response.emotion=="disgust"){
+                    emotions2.disgust++;
+                    emotions2.total++;
+                    config2.data.datasets[0].data[2]=emotions2.disgust;            
+                    window.myPie2.update();
+                }
+                else if (response.emotion=="fear"){
+                    emotions2.fear++;
+                    emotions2.total++;
+                    config2.data.datasets[0].data[3]=emotions2.fear;            
+                    window.myPie2.update();
+                }
+                else if (response.emotion=="happiness"){
+                    emotions2.happiness++;
+                    emotions2.total++;
+                    config2.data.datasets[0].data[4]=emotions2.happiness;            
+                    window.myPie2.update();
+                }
+                else if (response.emotion=="neutral"){
+                    emotions2.neutral++;
+                    emotions2.total++;
+                    config2.data.datasets[0].data[5]=emotions2.neutral;            
+                    window.myPie2.update();
+                }
+                else if (response.emotion=="sadness"){
+                    emotions2.sadness++;
+                    emotions2.total++;
+                    config2.data.datasets[0].data[6]=emotions2.sadness;            
+                    window.myPie2.update();
+                }
+                else if (response.emotion=="surprise"){
+                    emotions2.surprise++;
+                    emotions2.total++;
+                    config2.data.datasets[0].data[7]=emotions2.surprise;            
+                    window.myPie2.update();
+                }
+                
+
+
+                /////////////////////////////
+                if (response.looking=="right"){
+                    looking2.right++;
+                    looking2.total++;
+                    lookright2.click();
+                }
+                else if (response.looking=="left"){
+                    looking2.left++;
+                    looking2.total++;
+                    lookleft2.click();
+                }
+                else if (response.looking=="down"){
+                    looking2.down++;
+                    looking2.total++;
+                    lookdown2.click();
+                }
+                else if (response.looking=="straight"){
+                    looking2.straight++;
+                    looking2.total++;
+                    lookcenter2.click();
+
+                }
+
+
+                lef2.innerText=""+looking2.left;
+                righ2.innerText=""+looking2.right;
+                dow2.innerText=""+looking2.down;
+                cen2.innerText=""+looking2.straight;
+
+
+                //add positions to local array
+                positions.push(response.position);
+
+
+                chart2.data.datasets[0].data.push({x:response.position.x-450,y:340-response.position.y,v: response.position.width*7.5 });
+                chart2.update();
+            }
+
+     	});
+
+
+        socket.on('voiceUpdate',function(response){
+            if (response.question==1){
+
+                barChartData.datasets[0].data[0]+=response.um;
+                barChartData.datasets[0].data[1]+=response.like;
+                barChartData.datasets[0].data[2]+=response.youKnow;
+
+
+                var wordsPerMin=response.total/(response.duration/10000000)*60;
+                if (wordsPerMin<minValue)
+                    gauge.set(minValue);
+                else if(wordsPerMin>gauge.maxValue)
+                    gauge.set(gauge.maxValue);
+                else
+                    gauge.set(wordsPerMin);
+
+                window.myBar.update();
+            }
+            else if (response.question==2){
+                barChartData2.datasets[0].data[0]+=response.um;
+                barChartData2.datasets[0].data[1]+=response.like;
+                barChartData2.datasets[0].data[2]+=response.youKnow;
+
+
+                var wordsPerMin=response.total/(response.duration/10000000)*60;
+                if (wordsPerMin<minValue)
+                    gauge2.set(minValue);
+                else if(wordsPerMin>gauge.maxValue)
+                    gauge2.set(gauge.maxValue);
+                else
+                    gauge2.set(wordsPerMin);
+
+                window.myBar2.update();
+            }
+
+            console.log(response);
+
+        });
+
+
+        
+	</script>
+
+</body>
+</html>

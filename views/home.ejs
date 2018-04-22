@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta content="Display Webcam Stream" name="title">
+<title>Display Webcam Stream</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+<script type="text/javascript">
+    subscriptionKeyFACE="";
+    subscriptionKeyVoice="";
+</script>
+<style>
+    #container {
+        margin:auto;
+        position: relative; 
+        width: 900px;
+        height: 680px;
+        border: 10px #333 solid;
+
+    }
+    #videoElement {
+      /*transform: rotateY(180deg);*/
+        transform: scaleX(-1);
+        width: 100%/*900px; */;
+        height: 100% /*690px;  */;
+        background-color: #666;
+        position: absolute; 
+        z-index: -10;
+    }
+    
+</style>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+
+</head>
+ <body>
+    <br>
+    <br>
+    <br>
+    <img src="/logo.png" style="width:900px; display: block;
+    margin: 0 auto;">
+    <div id="container">
+        <video autoplay="true" id="videoElement"></video>
+        <svg style="position:absolute; z-index:10" width="100%" height="100%">
+            <rect id="rect" x="0" y="0" rx="20" ry="20" width="0" height="0"
+            style="fill:none;stroke:red;stroke-width:5;opacity:0.5" />
+            <circle id="Lpupil" cx="50" cy="50" r="0" stroke="black" stroke-width="1" fill="red" />
+            <circle id="Rpupil" cx="0" cy="0" r="2" stroke="black" stroke-width="1" fill="red" />
+            <circle id="Rout" cx="0" cy="0" r="2" stroke="black" stroke-width="1" fill="red" />
+            <circle id="Rinner" cx="0" cy="0" r="2" stroke="black" stroke-width="1" fill="red" />
+            <circle id="Rtop" cx="0" cy="0" r="2" stroke="black" stroke-width="1" fill="red" />
+            <circle id="Rbottom" cx="0" cy="0" r="2" stroke="black" stroke-width="1" fill="red" />
+            <circle id="center" cx="0" cy="0" r="5" stroke="black" stroke-width="1" fill="red" /> 
+        </svg>  
+    </div>
+
+    <br>
+    <br>
+    <br>
+    <h1 id="question" align="center" style="color:white"> question</h1>
+    <br>
+    <br>
+
+    <p align="center"><button id="play" onclick="wrapper()" style="background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    
+    font-size: 30px;
+    
+    cursor: pointer;
+    border-radius: 12px;">Start Session</button><p>
+
+    <canvas  style="visibility: hidden" id="myCanvas" width="900" height="680"></canvas>
+      
+    <script>
+
+      var socket=io.connect('http://localhost:3000');
+
+    	var video = document.querySelector("#videoElement");
+     
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
+     
+      if (navigator.getUserMedia) {       
+          navigator.getUserMedia({video: true}, handleVideo, videoError);
+      }
+     
+      function handleVideo(stream) {
+          video.src = window.URL.createObjectURL(stream);
+      }
+     
+      function videoError(e) {
+          // do something
+      }
+
+      var canvas, ctx;
+      canvas = document.getElementById("myCanvas");
+      ctx = canvas.getContext('2d');
+      ctx.translate(900, 0);
+      ctx.scale(-1, 1);
+
+        var rect=document.getElementById('rect');
+        var lpup=document.getElementById('Lpupil');
+        var Rpup=document.getElementById('Rpupil');
+        var Rout=document.getElementById('Rout');
+        var Rinner=document.getElementById('Rinner');
+        var Rtop=document.getElementById('Rtop');
+        var Rbottom=document.getElementById('Rbottom');
+        var center=document.getElementById('center');
+
+        
+      var clicked=0;
+
+      
+      function wrapper(){
+
+
+      //////Load results page///////
+      clicked++;
+
+      if (clicked==3){
+        RecognizerStop(SDK, recognizer);
+        clearInterval(interv);
+        var url = "http://localhost:3000/results";
+        window.location.href=url;
+      }
+      
+      
+
+      if (clicked==2){
+        document.getElementById("play").innerHTML="Stop Session";
+        document.getElementById("play").style.backgroundColor = "#CC0033";
+        document.getElementById("question").innerHTML="Question 2: What are your greatest strengths?";
+
+      }
+
+      if (clicked==1){
+        document.getElementById("play").innerHTML="Next Question";
+        document.getElementById("play").style.backgroundColor = "#b4b4b4";
+        document.getElementById("question").innerHTML="Question 1: Tell us about yourself";
+        document.getElementById("question").style.color="black";
+        Setup();           
+        RecognizerStart(SDK, recognizer);
+        
+
+      var interv= setInterval(function snapshot() {
+         // Draws current image from the video element into the canvas
+        ctx.drawImage(video, 0,0, canvas.width, canvas.height);
+
+        // Replace or verify the region.
+        //
+        // You must use the same region in your REST API call as you used to obtain your subscription keys.
+        // For example, if you obtained your subscription keys from the westus region, replace
+        // "westcentralus" in the URI below with "westus".
+        //
+        // NOTE: Free trial subscription keys are generated in the westcentralus region, so if you are using
+        // a free trial subscription key, you should not need to change this region.
+        var uriBase = "https://westus.api.cognitive.microsoft.com/face/v1.0/detect";
+
+        // Request parameters.
+        var params = {
+            "returnFaceId": "false",
+            "returnFaceLandmarks": "true",
+            "returnFaceAttributes": /*"age,gender,headPose,smile,facialHair,glasses,*/"emotion,headPose"/*,hair,makeup,occlusion,accessories,blur,exposure,noise", */
+        };
+
+
+        makeblob = function (dataURL) {
+            var BASE64_MARKER = ';base64,';
+            if (dataURL.indexOf(BASE64_MARKER) == -1) {
+                var parts = dataURL.split(',');
+                var contentType = parts[0].split(':')[1];
+                var raw = decodeURIComponent(parts[1]);
+                return new Blob([raw], { type: contentType });
+            }
+            var parts = dataURL.split(BASE64_MARKER);
+            var contentType = parts[0].split(':')[1];
+            var raw = window.atob(parts[1]);
+            var rawLength = raw.length;
+
+            var uInt8Array = new Uint8Array(rawLength);
+
+            for (var i = 0; i < rawLength; ++i) {
+                uInt8Array[i] = raw.charCodeAt(i);
+            }
+
+            return new Blob([uInt8Array], { type: contentType });
+        }
+
+
+
+        $.ajax({
+            url: uriBase + "?" + $.param(params),
+
+            // Request headers.
+            beforeSend: function(xhrObj){
+                xhrObj.setRequestHeader("Content-Type","application/octet-stream");
+                xhrObj.setRequestHeader("Ocp-Apim-Subscription-Key", subscriptionKeyFACE);
+            },
+
+            type: "POST",
+
+            // Request body.
+            data: makeblob(canvas.toDataURL()),
+            processData: false
+        })
+
+        .done(function(data) {
+
+            var jsonResponse=JSON.stringify(data, null, 2);
+            var j=JSON.parse(jsonResponse);
+            if (j[0]!=undefined){
+                if (clicked==1)
+                    socket.emit('face', {question:1, face:j[0]});
+                else if (clicked==2)
+                    socket.emit('face', {question:2, face:j[0]});
+                //console.log(jsonResponse);
+                
+                //print rectangle
+
+                rect.y.baseVal.value=j[0].faceRectangle.top ;
+                rect.x.baseVal.value=j[0].faceRectangle.left;
+                rect.width.baseVal.value=j[0].faceRectangle.width;
+                rect.height.baseVal.value=j[0].faceRectangle.height;
+                
+                Rpup.cx.baseVal.value=j[0].faceLandmarks.pupilRight.x;
+                Rpup.cy.baseVal.value=j[0].faceLandmarks.pupilRight.y;
+
+                Rout.cx.baseVal.value=j[0].faceLandmarks.eyeRightOuter.x;
+                Rout.cy.baseVal.value=j[0].faceLandmarks.eyeRightOuter.y;
+
+                Rinner.cx.baseVal.value=j[0].faceLandmarks.eyeRightInner.x;
+                Rinner.cy.baseVal.value=j[0].faceLandmarks.eyeRightInner.y;
+
+                Rtop.cx.baseVal.value=j[0].faceLandmarks.eyeRightTop.x;
+                Rtop.cy.baseVal.value=j[0].faceLandmarks.eyeRightTop.y;
+
+                Rbottom.cx.baseVal.value=j[0].faceLandmarks.eyeRightBottom.x;
+                Rbottom.cy.baseVal.value=j[0].faceLandmarks.eyeRightBottom.y;
+
+                center.cx.baseVal.value=j[0].faceRectangle.left+j[0].faceRectangle.width/2;
+                center.cy.baseVal.value=j[0].faceRectangle.top+j[0].faceRectangle.width/2;
+            }
+            
+        })
+
+
+        .fail(function(jqXHR, textStatus, errorThrown) {
+            // Display error message.
+            var errorString = (errorThrown === "") ? "Error. " : errorThrown + " (" + jqXHR.status + "): ";
+            errorString += (jqXHR.responseText === "") ? "" : (jQuery.parseJSON(jqXHR.responseText).message) ? 
+                jQuery.parseJSON(jqXHR.responseText).message : jQuery.parseJSON(jqXHR.responseText).error.message;
+            alert(errorString);
+        });
+
+        
+        },1000);
+
+        }
+      }
+    </script>
+
+
+
+    <script src="voiceRecogFiles"></script>
+    <!-- SDK USAGE -->
+    <script>
+        // On document load resolve the SDK dependency
+        function Initialize(onComplete) {
+            
+                onComplete(window.SDK); 
+        }
+        
+        // Setup the recognizer
+        function RecognizerSetup(SDK, recognitionMode, language, format, subscriptionKey) {
+            
+            switch (recognitionMode) {
+                case "Interactive" :
+                    recognitionMode = SDK.RecognitionMode.Interactive;    
+                    break;
+                case "Conversation" :
+                    recognitionMode = SDK.RecognitionMode.Conversation;    
+                    break;
+                case "Dictation" :
+                    recognitionMode = SDK.RecognitionMode.Dictation;    
+                    break;
+                default:
+                    recognitionMode = SDK.RecognitionMode.Interactive;
+            }
+
+            var recognizerConfig = new SDK.RecognizerConfig(
+                new SDK.SpeechConfig(
+                    new SDK.Context(
+                        new SDK.OS(navigator.userAgent, "Browser", null),
+                        new SDK.Device("SpeechSample", "SpeechSample", "1.0.00000"))),
+                recognitionMode,
+                language, // Supported languages are specific to each recognition mode. Refer to docs.
+                format); // SDK.SpeechResultFormat.Simple (Options - Simple/Detailed)
+
+
+            var useTokenAuth = false;
+            
+            var authentication = function() {
+                if (!useTokenAuth)
+                    return new SDK.CognitiveSubscriptionKeyAuthentication(subscriptionKey);
+
+                var callback = function() {
+                    var tokenDeferral = new SDK.Deferred();
+                    try {
+                        var xhr = new(XMLHttpRequest || ActiveXObject)('MSXML2.XMLHTTP.3.0');
+                        xhr.open('GET', '/token', 1);
+                        xhr.onload = function () {
+                            if (xhr.status === 200)  {
+                                tokenDeferral.Resolve(xhr.responseText);
+                            } else {
+                                tokenDeferral.Reject('Issue token request failed.');
+                            }
+                        };
+                        xhr.send();
+                    } catch (e) {
+                        window.console && console.log(e);
+                        tokenDeferral.Reject(e.message);
+                    }
+                    return tokenDeferral.Promise();
+                }
+
+                return new SDK.CognitiveTokenAuthentication(callback, callback);
+            }();
+            
+           
+                return SDK.CreateRecognizer(recognizerConfig, authentication);
+            
+        }
+
+        // Start the recognition
+        function RecognizerStart(SDK, recognizer) {
+            recognizer.Recognize((event) => {
+                /*
+                 Alternative syntax for typescript devs.
+                 if (event instanceof SDK.RecognitionTriggeredEvent)
+                */
+                switch (event.Name) {
+                    case "RecognitionTriggeredEvent" :
+                        console.log("triggered");
+                        break;
+                    case "ListeningStartedEvent" :
+                        console.log("Listening")
+                        break;
+                    case "RecognitionStartedEvent" :
+                        console.log("Started recog");
+                        break;
+                    case "SpeechStartDetectedEvent" :
+                        console.log("Detected speech");
+                        break;
+                    case "SpeechHypothesisEvent" :
+                        //UpdateRecognizedHypothesis(event.Result.Text, false);
+                        break;
+                    case "SpeechFragmentEvent" :
+                        //UpdateRecognizedHypothesis(event.Result.Text, true);
+                        break;
+                    case "SpeechEndDetectedEvent" :
+                        console.log("End detected");
+                        break;
+                    case "SpeechSimplePhraseEvent" :
+                        console.log("simple phrase");
+                        var voiceResult=JSON.parse(JSON.stringify(event.Result));
+                        console.log(voiceResult);
+                        if (voiceResult.RecognitionStatus!='EndOfDictation')
+                            socket.emit('voice', {question:clicked, voice: voiceResult});
+                        break;
+                    case "SpeechDetailedPhraseEvent" :
+                        console.log("detailed phrase");
+                        break;
+                    case "RecognitionEndedEvent" :
+                        break;
+                }
+            })
+            .On(() => {
+                // The request succeeded. Nothing to do here.
+            },
+            (error) => {
+                console.error(error);
+            });
+        }
+
+        // Stop the Recognition.
+        function RecognizerStop(SDK, recognizer) {
+            // recognizer.AudioSource.Detach(audioNodeId) can be also used here. (audioNodeId is part of ListeningStartedEvent)
+            recognizer.AudioSource.TurnOff();
+        }
+    </script>
+
+    <!-- Browser Hooks -->
+    <script>
+        var startBtn, stopBtn;
+        var inputSource;
+        var SDK;
+        var recognizer;
+
+        startBtn = document.getElementById("play");
+        stopBtn = document.getElementById("stopBtn");
+        
+        inputSource = document.getElementById("inputSource");
+        
+        Initialize(function (speechSdk) {
+            SDK = speechSdk;
+            startBtn.disabled = false;
+        });
+        
+
+        function Setup() {
+            if (recognizer != null) {
+                RecognizerStop(SDK, recognizer);
+            }
+            recognizer = RecognizerSetup(SDK, "Dictation", "en-US", SDK.SpeechResultFormat["Simple"], subscriptionKeyVoice);
+        }
+
+    </script>
+    </body>
+</html>
