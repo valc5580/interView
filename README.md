@@ -9,6 +9,10 @@ This was built using a Node server, using Express for routing, socket.io for com
 Simply clone the repository, execute "npm install", add your Bing Speech API and Microsoft FACE API subscription keys in the home.ejs file, and replace "http://localhost:3000" in all files with whatever URL you like.
 
 
+![Alt text](./preview1.png?raw=true "Home Screen")
+![Alt text](./preview2.png?raw=true "Dashboard Screen")
+
+
 
 
 
